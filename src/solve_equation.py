@@ -9,11 +9,11 @@ from sympy import plot_implicit, symbols, Eq, And
 y1, y2 = symbols('y1 y2')
 
 
-x0 =   150000000000.0  # offer pool
-x1 =   40000000000.0  # ask pool
-offer = 5500000000.0 # offer
+x0 =   40000000000.0  # offer pool
+x1 =   80000000000.0  # ask pool
+offer = 1500000000.0 # offer
 x0_o = x0 + offer
-gamma = 0.0001
+gamma = 0.001
 A = 100.0
 p = x0 * x1
 s = x0 + x1
@@ -32,13 +32,13 @@ def compute_curve_v1_d(x):
 
 def main():
     d = scipy.optimize.fsolve(compute_curve_v2_d, x_start)
-    print("d = ", d[0])
+    print("d v2 = ", d[0])
     
-    d_v1 = scipy.optimize.fsolve(compute_curve_v1_d, x_start)
-    print("v1  d =", d_v1[0]);
+    #d_v1 = scipy.optimize.fsolve(compute_curve_v1_d, x_start)
+    #print("v1  d =", d_v1[0]);
     
    
-    # d = scipy.optimize.fsolve(compute_ask_pool, x_start)
+    d = scipy.optimize.fsolve(compute_ask_pool, x_start)
     t1 = 4 * x0_o * A * gamma**2 * d**3
     t2 = d**2 * gamma + d**2
     
@@ -52,7 +52,8 @@ def main():
         return 4.0 * x0_o * x * A * gamma**2 / (d**2 * (gamma**2 + 1- 4*x0_o*x/d**2)**2) *d*(x0_o+x-d)+ \
             x0_o * x - d**2/4
     
-    
+    def compute_curve_v2_ask_pool_2(x):
+        return 4.0* x0_o * x * (x0_o + x -d) * gamma**2 / (d * (gamma + 1 - 4.0 * x0_o * x / d**2)**2) + x0_o * x - d**2 / 4.0
   
     x_1_start = d**2 / (2 * x0)
     
@@ -61,15 +62,16 @@ def main():
    
     show_options(solver="root_scalar", method="newton")
    # show_options(solver="root_scalar", method="bisect")
-    #sol_root_v2 = root(compute_curve_v2_ask_pool, x_1_start)
-    #print("v2 root = ", sol_root_v2.x)
+    sol_root_v2 = root(compute_curve_v2_ask_pool_2, x_1_start)
+    print("v2 root = ", sol_root_v2.x)
+    print("ask amount = ", x1 - sol_root_v2.x)
     #print("v2 ask pool = ", sol_root_v2.x[0])
     #print("v2 ask amount = ", x1 - sol_root_v2.x[0])
     
-    sol_root_v1 = root(compute_curve_v1_ask_pool, x1_v1_start)
-    print("v1 root = ", sol_root_v1.x)
-    print("v1 ask pool = ", sol_root_v1.x[0])
-    print("v1 ask amount = ", x1 - sol_root_v1.x[0])
+    #sol_root_v1 = root(compute_curve_v1_ask_pool, x1_v1_start)
+    #print("v1 root = ", sol_root_v1.x)
+    #print("v1 ask pool = ", sol_root_v1.x[0])
+    #print("v1 ask amount = ", x1 - sol_root_v1.x[0])
     
     
     
